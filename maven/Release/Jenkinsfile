@@ -3,6 +3,9 @@
 def canaryVersion = "1.0.${env.BUILD_NUMBER}"
 def utils = new io.fabric8.Utils()
 mavenNode {
+  env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', '192.168.1.87')
+  env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', '5000')
+
   checkout scm
   if (utils.isCI()){
 
