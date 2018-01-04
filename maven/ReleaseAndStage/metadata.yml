@@ -1,7 +1,0 @@
-environments:
-  - Test
-  - Stage
-stages:
-  - 'Build Release'
-  - 'Integration Test'
-  - 'Rollout to Stage'
