@@ -12,7 +12,8 @@ clientsNode{
   if (!fileExists ('Dockerfile')) {
     writeFile file: 'Dockerfile', text: 'FROM fabric8/swift:2.2-SNAPSHOT-onbuild'
   }
-
+  env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', '192.168.1.87')
+  env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', '5000')
   newVersion = performCanaryRelease {}
   
   def rc = getDeploymentResources {
