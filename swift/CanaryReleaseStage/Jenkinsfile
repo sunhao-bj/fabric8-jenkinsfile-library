@@ -2,6 +2,9 @@
 @Library('github.com/fabric8io/fabric8-pipeline-library@v2.2.311')
 def utils = new io.fabric8.Utils()
 clientsNode{
+  env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', '192.168.1.87')
+  env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', '5000')
+
   def envStage = utils.environmentNamespace('staging')
   def newVersion = ''
 
@@ -10,7 +13,7 @@ clientsNode{
   stage 'Canary release'
   echo 'NOTE: running pipelines for the first time will take longer as build and base docker images are pulled onto the node'
   if (!fileExists ('Dockerfile')) {
-    writeFile file: 'Dockerfile', text: 'FROM fabric8/swift:2.2-SNAPSHOT-onbuild'
+    writeFile file: 'Dockerfile', text: 'FROM registry.timeondata.com/fabric8/swift:2.2-SNAPSHOT-onbuild'
   }
 
   newVersion = performCanaryRelease {}

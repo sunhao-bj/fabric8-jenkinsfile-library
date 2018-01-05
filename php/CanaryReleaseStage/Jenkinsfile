@@ -4,6 +4,9 @@
 def utils = new io.fabric8.Utils()
 
 clientsNode{
+  env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', '192.168.1.87')
+  env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', '5000')
+
   def envStage = utils.environmentNamespace('staging')
   def newVersion = ''
 
@@ -11,7 +14,7 @@ clientsNode{
   stage 'Canary release'
   echo 'NOTE: running pipelines for the first time will take longer as build and base docker images are pulled onto the node'
   if (!fileExists ('Dockerfile')) {
-    writeFile file: 'Dockerfile', text: 'FROM fabric8/php:onbuild'
+    writeFile file: 'Dockerfile', text: 'FROM registry.timeondata.com/fabric8/php:onbuild'
   }
 
   newVersion = performCanaryRelease {}
