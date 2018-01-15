@@ -43,7 +43,7 @@ mavenNode{
     }
 
     stage 'Rollout Staging'
-    kubernetesApply(environment: envStage)
+    kubernetesApply(file: rc, environment: envStage)
 
     stage 'Approve'
     approve {
@@ -54,7 +54,7 @@ mavenNode{
     }
 
     stage 'Rollout Production'
-    kubernetesApply(environment: envProd)
+    kubernetesApply(file: rc, environment: envProd)
 
   }
 }

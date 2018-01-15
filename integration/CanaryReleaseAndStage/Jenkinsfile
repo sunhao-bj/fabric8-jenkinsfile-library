@@ -40,7 +40,7 @@ mavenNode{
   	}
 
     stage 'Rollout Staging'
-    kubernetesApply(environment: envStage)
+    kubernetesApply(file: rc, environment: envStage)
 
   }
 }
