@@ -31,7 +31,7 @@ mavenNode{
     }
 
     stage 'Integration Test'
-    mavenIntegrationAndMicroserviceTest{
+    def rc = mavenIntegrationAndMicroserviceTest{
        port = 8080
        label = ''
   	   environment = envTest
