@@ -1,29 +1,37 @@
 #!/usr/bin/groovy
 @Library('github.com/MrChencc/dos-pipeline-test@master')
 def dummy
+
+import com.tod.CostomPipelineUtil
+
 mavenNode {
     ws {
         env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', registryHost)
         env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', registryPort)
-        def costomConfigStr = costomMavenConfig // 文字形式的配置信息
         checkout scm
-        // TODO 继续处理
+
+        def costomConfigStr = readFile "CostomMavenConfig.json" // 读取配置文件
+        def costomConfig = CostomPipelineUtil.getJsonPipelineConfig(costomConfigStr)
+        
         container(name: 'maven') {
             stage('Maven build') {
                 sh 'source /etc/profile'
-                sh 'mvn -f pom-project-generator.xml clean package -DskipTests'
+                sh costomConfig.build.buildShell
             }
-            stage('Package and Namespace') {
-                def replace = dosReplaceYaml {}
-                sh replace
-            }
-            stage('docker push') {
+            // stage('Package and Namespace') {
+            //     def replace = dosReplaceYaml {}
+            //     sh replace
+            // }
+            stage('docker build') {
+                def buildShell = 
                 mavenCanaryRelease {
                     version = 'latest'
-                    pom = 'PROJECT-GENERATOR/pom.xml'
-                    dockerfilePath = 'PROJECT-GENERATOR/Dockerfile'
+                    pom = costomConfig.build.pomfile
+                    dockerfilePath = costomConfig.build.dockerfile
                 }
             }
+
+        // TODO 继续处理
 
             stage 'get yaml and env'
             def yaml = getKubernetesYaml{
