@@ -23,7 +23,6 @@ mavenNode {
             //     sh replace
             // }
             stage('docker build') {
-                def buildShell = 
                 mavenCanaryRelease {
                     version = 'latest'
                     pom = costomConfig.build.pomfile
