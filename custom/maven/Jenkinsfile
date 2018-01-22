@@ -2,8 +2,7 @@
 @Library('github.com/MrChencc/dos-pipeline-test@master')
 def dummy
 
-import com.tod.CostomPipelineUtil
-
+import com.tod.CustomPipelineUtil
 mavenNode {
     ws {
         env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', registryHost)
@@ -12,31 +11,33 @@ mavenNode {
 
         def customConfigStr = readFile "${env.JOB_NAME}/Config.json" // 读取配置文件
         def customConfig = CustomPipelineUtil.getJsonPipelineConfig(customConfigStr)
-        
+
         container(name: 'maven') {
-            stage('Maven build') {
-                sh 'source /etc/profile'
-                sh customConfig.build.buildShell
+            stage('build with config') {
+                buildWithConfig {
+                    custom = customConfig
+                }
             }
 
-            stage('docker build') {
+            stage('docker build and push image') {
                 mavenCanaryRelease {
-                    version = 'latest'
+                    version = customConfig.version
                     pom = customConfig.build.pomfile
                     dockerfilePath = customConfig.build.dockerfile
                 }
             }
 
-        // TODO 继续处理
+            // TODO 继续处理
 
             stage 'get yaml and env'
             def yaml = getKubernetesYaml{
-                port = '29164'
+                port = '29154'
                 label = 'dos-proj'
                 icon = 'https://cdn.rawgit.com/fabric8io/fabric8/dc05040/website/src/images/logos/spring-boot.svg'
-                version = 'latest'
-                pom = 'PROJECT-GENERATOR/pom.xml'
+                version = customConfig.version
+                pom = customConfig.build.pomfile
             }
+
             def envTest = 'dosproj-pipeline-test'
 
             stage('deploy application') {
