@@ -10,23 +10,20 @@ mavenNode {
         env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', registryPort)
         checkout scm
 
-        def costomConfigStr = readFile "CostomMavenConfig.json" // 读取配置文件
-        def costomConfig = CostomPipelineUtil.getJsonPipelineConfig(costomConfigStr)
+        def customConfigStr = readFile "${env.JOB_NAME}/Config.json" // 读取配置文件
+        def customConfig = CustomPipelineUtil.getJsonPipelineConfig(customConfigStr)
         
         container(name: 'maven') {
             stage('Maven build') {
                 sh 'source /etc/profile'
-                sh costomConfig.build.buildShell
+                sh customConfig.build.buildShell
             }
-            // stage('Package and Namespace') {
-            //     def replace = dosReplaceYaml {}
-            //     sh replace
-            // }
+
             stage('docker build') {
                 mavenCanaryRelease {
                     version = 'latest'
-                    pom = costomConfig.build.pomfile
-                    dockerfilePath = costomConfig.build.dockerfile
+                    pom = customConfig.build.pomfile
+                    dockerfilePath = customConfig.build.dockerfile
                 }
             }
 
