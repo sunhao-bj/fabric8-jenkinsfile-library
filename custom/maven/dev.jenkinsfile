@@ -3,6 +3,7 @@
 def dummy
 
 import com.tod.CustomPipelineUtil
+
 mavenNode {
     ws {
         env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', registryHost)
@@ -11,6 +12,7 @@ mavenNode {
 
         def customConfigStr = readFile "${env.JOB_NAME}/Config.json" // 读取配置文件
         def customConfig = CustomPipelineUtil.getJsonPipelineConfig(customConfigStr)
+        def docker_image = ''
 
         container(name: 'maven') {
             stage('build with config') {
@@ -20,28 +22,21 @@ mavenNode {
             }
 
             stage('docker build and push image') {
-                mavenCanaryRelease {
+                docker_image = customMavenRelease {
                     version = customConfig.version
                     pom = customConfig.build.pomfile
                     dockerfilePath = customConfig.build.dockerfile
                 }
+                echo 'Docker image : ${docker_image}'
             }
-
-            // TODO 继续处理
-
-            stage 'get yaml and env'
-            def yaml = getKubernetesYaml{
-                port = '29154'
-                label = 'dos-proj'
-                icon = 'https://cdn.rawgit.com/fabric8io/fabric8/dc05040/website/src/images/logos/spring-boot.svg'
-                version = customConfig.version
-                pom = customConfig.build.pomfile
-            }
-
-            def envTest = 'dosproj-pipeline-test'
 
             stage('deploy application') {
-                kubernetesApply(file: yaml, environment: envTest)
+                def yaml = getCustomK8SYaml{
+                    deployment = customConfig.deployment
+                    version = customConfig.version
+                    image = docker_image
+                }
+                kubernetesApply(file: yaml, environment: 'project-test')
             }
         }
     }
