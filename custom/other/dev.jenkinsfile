@@ -14,27 +14,29 @@ clientsNode {
         def customConfig = CustomPipelineUtil.getJsonPipelineConfig(customConfigStr)
         def docker_image = ''
 
-        stage('build with config') {
-            buildWithConfig {
-                custom = customConfig
+        container(name: 'docker') {
+            stage('build with config') {
+                buildWithConfig {
+                    custom = customConfig
+                }
             }
-        }
 
-        stage('docker build and push image') {
-            docker_image = customOtherRelease {
-                version = customConfig.version
-                dockerfilePath = customConfig.build.dockerfile
+            stage('docker build and push image') {
+                docker_image = customOtherRelease {
+                    version = customConfig.version
+                    dockerfilePath = customConfig.build.dockerfile
+                }
+                echo 'Docker image : ${docker_image}'
             }
-            echo 'Docker image : ${docker_image}'
-        }
 
-        stage('deploy application') {
-            def yaml = getCustomK8SYaml {
-                deployment = customConfig.deployment
-                version = customConfig.version
-                image = docker_image
+            stage('deploy application') {
+                def yaml = getCustomK8SYaml {
+                    deployment = customConfig.deployment
+                    version = customConfig.version
+                    image = docker_image
+                }
+                kubernetesApply(file: yaml, environment: 'project-test')
             }
-            kubernetesApply(file: yaml, environment: 'project-test')
         }
     }
 }
