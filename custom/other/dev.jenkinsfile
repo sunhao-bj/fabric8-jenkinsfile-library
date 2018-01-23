@@ -14,7 +14,7 @@ clientsNode {
         def customConfig = CustomPipelineUtil.getJsonPipelineConfig(customConfigStr)
         def docker_image = ''
 
-        container(name: 'docker') {
+        container(name: 'clients') {
             stage('build with config') {
                 buildWithConfig {
                     custom = customConfig
