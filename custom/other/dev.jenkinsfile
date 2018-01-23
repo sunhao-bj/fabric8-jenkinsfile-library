@@ -4,7 +4,7 @@ def dummy
 
 import com.tod.CustomPipelineUtil
 
-mavenNode {
+clientsNode {
     ws {
         env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', registryHost)
         env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', registryPort)
@@ -14,29 +14,27 @@ mavenNode {
         def customConfig = CustomPipelineUtil.getJsonPipelineConfig(customConfigStr)
         def docker_image = ''
 
-        container(name: 'maven') {
-            stage('build with config') {
-                buildWithConfig {
-                    custom = customConfig
-                }
+        stage('build with config') {
+            buildWithConfig {
+                custom = customConfig
             }
+        }
 
-            stage('docker build and push image') {
-                docker_image = customOtherRelease {
-                    version = customConfig.version
-                    dockerfilePath = customConfig.build.dockerfile
-                }
-                echo 'Docker image : ${docker_image}'
+        stage('docker build and push image') {
+            docker_image = customOtherRelease {
+                version = customConfig.version
+                dockerfilePath = customConfig.build.dockerfile
             }
+            echo 'Docker image : ${docker_image}'
+        }
 
-            stage('deploy application') {
-                def yaml = getCustomK8SYaml{
-                    deployment = customConfig.deployment
-                    version = customConfig.version
-                    image = docker_image
-                }
-                kubernetesApply(file: yaml, environment: 'project-test')
+        stage('deploy application') {
+            def yaml = getCustomK8SYaml {
+                deployment = customConfig.deployment
+                version = customConfig.version
+                image = docker_image
             }
+            kubernetesApply(file: yaml, environment: 'project-test')
         }
     }
 }
