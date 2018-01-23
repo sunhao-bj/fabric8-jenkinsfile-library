@@ -1,6 +1,5 @@
 #!/usr/bin/groovy
-//@Library('github.com/MrChencc/dos-pipeline-test@master')
-@Library('github.com/sunhao-bj/fabric8-pipeline-library@v2.2.4')
+@Library('github.com/MrChencc/dos-pipeline-test@master')
 
 def dummy
 
