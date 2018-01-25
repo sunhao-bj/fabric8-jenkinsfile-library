@@ -31,7 +31,8 @@ mavenNode{
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', registryHost)
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', registryPort)
 
-  def envStage = utils.environmentNamespace('staging')
+ //  def envStage = utils.environmentNamespace('staging')
+   def envStage = DEPLOY_NAMESPACE
 
   checkout scm
 //  git GIT_URL

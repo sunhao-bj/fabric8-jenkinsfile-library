@@ -15,7 +15,7 @@ def label = "buildpod.${env.JOB_NAME}.${env.BUILD_NUMBER}".replace('-', '_').rep
 mavenNode{
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', registryHost)
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', registryPort)
-  def envTest = utils.environmentNamespace('testing')
+  def envTest = DEPLOY_NAMESPACE
 
   checkout scm
 //  git GIT_URL
