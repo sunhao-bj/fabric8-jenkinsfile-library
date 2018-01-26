@@ -31,10 +31,11 @@ mavenNode{
     stage 'Integration Test'
     mavenIntegrationAndMicroserviceTest{
       port = 8080
-      label = ''
+      label = 'maven'
  	  environment = envTest
       icon = 'https://cdn.rawgit.com/fabric8io/fabric8/dc05040/website/src/images/logos/spring-boot.svg'
       version = canaryVersion
+      exposeApp = IS_EXPOSE
  	}
   }
 }

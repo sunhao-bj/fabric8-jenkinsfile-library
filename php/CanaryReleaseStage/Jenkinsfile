@@ -7,7 +7,6 @@ clientsNode{
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', registryHost)
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', registryPort)
 
-//  def envStage = utils.environmentNamespace('staging')
   def envStage = DEPLOY_NAMESPACE
   def newVersion = ''
 
@@ -26,6 +25,7 @@ clientsNode{
     label = 'php'
     icon = 'https://cdn.rawgit.com/fabric8io/fabric8/aebfa59/website/src/images/logos/php.png'
     version = newVersion
+    exposeApp = IS_EXPOSE
     imageName = clusterImageName
   }
 

@@ -30,6 +30,7 @@ def label = "buildpod.${env.JOB_NAME}.${env.BUILD_NUMBER}".replace('-', '_').rep
 mavenNode{
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', registryHost)
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', registryPort)
+  def envTest = DEPLOY_NAMESPACE
 
   checkout scm
 //  git GIT_URL
@@ -42,11 +43,14 @@ mavenNode{
       version = canaryVersion
     }
 
-    stage 'Integration Test'
-    mavenIntegrationTest {
-      environment = 'Testing'
-      failIfNoTests = localFailIfNoTests
-      itestPattern = localItestPattern
+   stage 'Integration Test'
+   mavenIntegrationAndMicroserviceTest{
+     port = 8080
+     label = 'maven'
+      environment = envTest
+     icon = 'https://cdn.rawgit.com/fabric8io/fabric8/dc05040/website/src/images/logos/spring-boot.svg'
+     version = canaryVersion
+     exposeApp = IS_EXPOSE
     }
   }
 }

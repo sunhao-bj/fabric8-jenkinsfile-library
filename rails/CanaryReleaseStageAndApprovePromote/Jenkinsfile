@@ -5,9 +5,7 @@ clientsNode{
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', registryHost)
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', registryPort)
 
-//  def envStage = utils.environmentNamespace('staging')
-  def envStage = DEPLOY_NAMESPACE
-  def envProd = utils.environmentNamespace('production')
+  def envProd = DEPLOY_NAMESPACE
   def newVersion = ''
 
   checkout scm
@@ -26,18 +24,16 @@ clientsNode{
     label = 'rails'
     icon = 'https://cdn.rawgit.com/fabric8io/fabric8-console/38f589a/img/icons/ruby.png'
     version = newVersion
+    exposeApp = IS_EXPOSE
     imageName = clusterImageName
   }
-
-  stage 'Rollout Staging'
-  kubernetesApply(file: rc, environment: envStage)
 
   stage 'Approve'
   approve{
     room = null
     version = canaryVersion
     console = fabric8Console
-    environment = envStage
+    environment = envProd
   }
 
   stage 'Rollout Production'

@@ -5,7 +5,6 @@ clientsNode{
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', registryHost)
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', registryPort)
 
-//  def envStage = utils.environmentNamespace('staging')
   def envStage = DEPLOY_NAMESPACE
   def newVersion = ''
 
@@ -26,6 +25,7 @@ clientsNode{
     icon = 'https://cdn.rawgit.com/fabric8io/fabric8/dc05040/website/src/images/logos/gopher.png'
     version = newVersion
     imageName = clusterImageName
+    exposeApp = IS_EXPOSE
   }
 
   stage 'Rollout Staging'
