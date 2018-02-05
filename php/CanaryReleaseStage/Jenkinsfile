@@ -3,12 +3,20 @@
 
 def utils = new io.fabric8.Utils()
 
+def versionPrefix = ""
+try {
+  versionPrefix = VERSION_PREFIX
+} catch (Throwable e) {
+  versionPrefix = "1.0"
+}
+
+def canaryVersion = "${versionPrefix}.${env.BUILD_NUMBER}"
+
 clientsNode{
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', registryHost)
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', registryPort)
 
   def envStage = DEPLOY_NAMESPACE
-  def newVersion = ''
 
   checkout scm
 //  git GIT_URL
@@ -18,13 +26,15 @@ clientsNode{
     writeFile file: 'Dockerfile', text: 'FROM registry.timeondata.com/fabric8/php:onbuild'
   }
 
-  newVersion = performCanaryRelease {}
+  performCanaryRelease {
+    version = canaryVersion
+  }
 
   def rc = getKubernetesJson {
     port = 80
     label = 'php'
     icon = 'https://cdn.rawgit.com/fabric8io/fabric8/aebfa59/website/src/images/logos/php.png'
-    version = newVersion
+    version = canaryVersion
     exposeApp = IS_EXPOSE
     imageName = clusterImageName
   }

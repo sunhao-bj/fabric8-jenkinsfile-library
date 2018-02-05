@@ -1,12 +1,21 @@
 #!/usr/bin/groovy
 @Library('github.com/sunhao-bj/fabric8-pipeline-library@v2.2.4')
 def utils = new io.fabric8.Utils()
+
+def versionPrefix = ""
+try {
+  versionPrefix = VERSION_PREFIX
+} catch (Throwable e) {
+  versionPrefix = "1.0"
+}
+
+def canaryVersion = "${versionPrefix}.${env.BUILD_NUMBER}"
+
 clientsNode{
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_HOST', registryHost)
   env.setProperty('FABRIC8_DOCKER_REGISTRY_SERVICE_PORT', registryPort)
 
   def envProd = DEPLOY_NAMESPACE
-  def newVersion = ''
 
   checkout scm
 //  git GIT_URL
@@ -17,13 +26,15 @@ clientsNode{
     writeFile file: 'Dockerfile', text: 'FROM registry.timeondata.com/fabric8/swift:2.2-SNAPSHOT-onbuild'
   }
 
-  newVersion = performCanaryRelease {}
+  performCanaryRelease {
+    version = canaryVersion
+  }
 
   def rc = getKubernetesJson {
     port = 8080
     label = 'swift'
     icon = 'https://cdn.rawgit.com/fabric8io/fabric8-console/master/img/icons/swift.png'
-    version = newVersion
+    version = canaryVersion
     exposeApp = IS_EXPOSE
     imageName = clusterImageName
   }
